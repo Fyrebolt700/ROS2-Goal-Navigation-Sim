@@ -6,4 +6,4 @@ This project was completed as part of the WATonomous ASD Admissions Assignment. 
 
 ## Demo
 
-![Demo](media/demo.gif)
+![Demo](demo.jpg)
