@@ -45,6 +45,11 @@ void PlannerNode::mapCallback(
 void PlannerNode::goalCallback(
   const geometry_msgs::msg::PointStamped::SharedPtr msg)
 {
+  RCLCPP_INFO(this->get_logger(), "New goal: (%.2f, %.2f), frame: %s",
+              msg->point.x,
+              msg->point.y,
+              msg->header.frame_id.c_str());
+
   planner_.updateGoal(msg);
 }
 
