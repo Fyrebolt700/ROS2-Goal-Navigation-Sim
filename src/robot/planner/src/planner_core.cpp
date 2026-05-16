@@ -44,11 +44,14 @@ nav_msgs::msg::Path PlannerCore::planSimplePath()
   path.header.frame_id = "odom";
 
   geometry_msgs::msg::PoseStamped start;
+  start.header = path.header;
   start.pose = robot_pose_;
 
   geometry_msgs::msg::PoseStamped goal_pose;
+  goal_pose.header = path.header;
   goal_pose.pose.position.x = goal_.point.x;
   goal_pose.pose.position.y = goal_.point.y;
+  goal_pose.pose.position.z = 0.0;
   goal_pose.pose.orientation.w = 1.0;
 
   path.poses.push_back(start);
