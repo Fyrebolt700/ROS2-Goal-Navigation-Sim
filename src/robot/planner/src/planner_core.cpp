@@ -2,6 +2,7 @@
 #include <cmath>
 #include <limits>
 #include <queue>
+#include <utility>
 #include <vector>
 
 namespace robot
@@ -117,9 +118,83 @@ nav_msgs::msg::Path PlannerCore::planSimplePath()
   std::vector<double> cost_so_far(width * height, std::numeric_limits<double>::infinity());
   std::vector<int> parent(width * height, -1);
 
+  auto isOccupied = [&](int grid_x, int grid_y) -> bool {
+  if (grid_x < 0 || grid_x >= width || grid_y < 0 || grid_y >= height) {
+    return true;
+  }
+
+  const int cell_value = map_.data[index(grid_x, grid_y)];
+  return cell_value > 50;
+  };
+
+  if (isOccupied(start_x, start_y)) {
+    RCLCPP_WARN(logger_, "Start cell is occupied.");
+    return path;
+  }
+
+  if (isOccupied(goal_x, goal_y)) {
+    RCLCPP_WARN(logger_, "Goal cell is occupied.");
+    return path;
+  }
+
   open_set.push({start_index, 0.0});
   cost_so_far[start_index] = 0.0;
   parent[start_index] = start_index;
+
+  const std::vector<std::pair<int, int>> directions = {
+  {1, 0}, {-1, 0}, {0, 1}, {0, -1},
+  {1, 1}, {1, -1}, {-1, 1}, {-1, -1}
+  };
+
+  bool found_path = false;
+
+  while (!open_set.empty()) {
+    const QueueNode current_node = open_set.top();
+    open_set.pop();
+
+    const int current_index = current_node.index;
+
+    if (current_index == goal_index) {
+      found_path = true;
+      break;
+    }
+
+    const int current_x = current_index % width;
+    const int current_y = current_index / width;
+
+    for (const auto& direction : directions) {
+      const int next_x = current_x + direction.first;
+      const int next_y = current_y + direction.second;
+
+      if (next_x < 0 || next_x >= width || next_y < 0 || next_y >= height) {
+        continue;
+      }
+
+      if (isOccupied(next_x, next_y)) {
+        continue;
+      }
+
+      const int next_index = index(next_x, next_y);
+
+      const double step_cost =
+        (direction.first != 0 && direction.second != 0) ? 1.414 : 1.0;
+
+      const double new_cost = cost_so_far[current_index] + step_cost;
+
+      if (new_cost < cost_so_far[next_index]) {
+        cost_so_far[next_index] = new_cost;
+        parent[next_index] = current_index;
+
+        const double priority = new_cost + heuristic(next_x, next_y);
+        open_set.push({next_index, priority});
+      }
+    }
+  }
+
+  if (!found_path) {
+    RCLCPP_WARN(logger_, "No obstacle-free path found.");
+    return path;
+  }
 
   geometry_msgs::msg::PoseStamped start;
   start.header = path.header;
