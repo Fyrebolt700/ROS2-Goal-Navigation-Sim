@@ -20,7 +20,7 @@ nav_msgs::msg::OccupancyGrid CostmapCore::createCostmap(
   const double origin_y = -20.0;
 
   costmap_msg.header.stamp = rclcpp::Clock().now();
-  costmap_msg.header.frame_id = "base_link";
+  costmap_msg.header.frame_id = scan->header.frame_id;
 
   costmap_msg.info.resolution = resolution;
   costmap_msg.info.width = width;
