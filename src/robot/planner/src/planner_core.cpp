@@ -1,5 +1,8 @@
 #include "planner_core.hpp"
 #include <cmath>
+#include <limits>
+#include <queue>
+#include <vector>
 
 namespace robot
 {
@@ -85,6 +88,38 @@ nav_msgs::msg::Path PlannerCore::planSimplePath()
     goal_x,
     goal_y
   );
+
+  auto index = [&](int grid_x, int grid_y) -> int {
+  return grid_y * width + grid_x;
+  };
+
+  auto heuristic = [&](int grid_x, int grid_y) -> double {
+    const double dx = static_cast<double>(grid_x - goal_x);
+    const double dy = static_cast<double>(grid_y - goal_y);
+    return std::sqrt(dx * dx + dy * dy);
+  };
+
+  struct QueueNode {
+    int index;
+    double priority;
+  };
+
+  struct CompareQueueNode {
+    bool operator()(const QueueNode& a, const QueueNode& b) const {
+      return a.priority > b.priority;
+    }
+  };
+
+  const int start_index = index(start_x, start_y);
+  const int goal_index = index(goal_x, goal_y);
+
+  std::priority_queue<QueueNode, std::vector<QueueNode>, CompareQueueNode> open_set;
+  std::vector<double> cost_so_far(width * height, std::numeric_limits<double>::infinity());
+  std::vector<int> parent(width * height, -1);
+
+  open_set.push({start_index, 0.0});
+  cost_so_far[start_index] = 0.0;
+  parent[start_index] = start_index;
 
   geometry_msgs::msg::PoseStamped start;
   start.header = path.header;
