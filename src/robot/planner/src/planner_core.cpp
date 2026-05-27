@@ -41,7 +41,7 @@ nav_msgs::msg::Path PlannerCore::planSimplePath()
   nav_msgs::msg::Path path;
 
   path.header.stamp = rclcpp::Clock().now();
-  path.header.frame_id = "odom";
+  path.header.frame_id = "sim_world";
 
   geometry_msgs::msg::PoseStamped start;
   start.header = path.header;

@@ -1,0 +1,144 @@
+Running docker compose --profile deploy -f /c/Users/Ritha/OneDrive/Desktop/WATO/wato_asd_training/modules/docker-compose.robot.yaml -f /c/Users/Ritha/OneDrive/Desktop/WATO/wato_asd_training/modules/docker-compose.gazebo.yaml -f /c/Users/Ritha/OneDrive/Desktop/WATO/wato_asd_training/modules/docker-compose.vis_tools.yaml build robot
+ Image ghcr.io/watonomous/wato_asd_training/robot:rithanya-wato_training Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 910B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from robot.Dockerfile
+#2 transferring dockerfile: 2.00kB 0.0s done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for ghcr.io/watonomous/robot_base/base:humble-ubuntu22.04
+#3 DONE 0.4s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 importing cache manifest from ghcr.io/watonomous/wato_asd_training/robot:rithanya-wato_training
+#6 ERROR: failed to configure registry cache importer: failed to authorize: failed to fetch anonymous token: unexpected status from GET request to https://ghcr.io/token?scope=repository%3Awatonomous%2Fwato_asd_training%2Frobot%3Apull&service=ghcr.io: 403 Forbidden
+
+#7 [source 1/9] FROM ghcr.io/watonomous/robot_base/base:humble-ubuntu22.04@sha256:26c1a7b36feb81c1cb5722d53060efcc119ca4407695a6075da476e31453a0a5
+#7 resolve ghcr.io/watonomous/robot_base/base:humble-ubuntu22.04@sha256:26c1a7b36feb81c1cb5722d53060efcc119ca4407695a6075da476e31453a0a5 0.1s done
+#7 DONE 0.1s
+
+#8 importing cache manifest from ghcr.io/watonomous/wato_asd_training/robot:main
+#8 ERROR: failed to configure registry cache importer: failed to authorize: failed to fetch anonymous token: unexpected status from GET request to https://ghcr.io/token?scope=repository%3Awatonomous%2Fwato_asd_training%2Frobot%3Apull&service=ghcr.io: 403 Forbidden
+
+#5 [internal] load build context
+#5 transferring context: 3.09kB 0.0s done
+#5 DONE 0.1s
+
+#9 [source 5/9] COPY src/robot/map_memory map_memory
+#9 CACHED
+
+#10 [source 2/9] WORKDIR /home/bolty/ament_ws/src
+#10 CACHED
+
+#11 [source 9/9] RUN apt-get -qq update && rosdep update &&     rosdep install --from-paths . --ignore-src -r -s         | (grep 'apt-get install' || true)         | awk '{print $3}'         | sort  > /tmp/colcon_install_list
+#11 CACHED
+
+#12 [dependencies 2/7] COPY --from=source /tmp/colcon_install_list /tmp/colcon_install_list
+#12 CACHED
+
+#13 [dependencies 5/7] COPY --from=source /home/bolty/ament_ws/src src
+#13 CACHED
+
+#14 [dependencies 3/7] RUN apt-fast install -qq -y --no-install-recommends $(cat /tmp/colcon_install_list)
+#14 CACHED
+
+#15 [source 8/9] COPY src/robot/bringup_robot bringup_robot
+#15 CACHED
+
+#16 [source 3/9] COPY src/robot/odometry_spoof odometry_spoof
+#16 CACHED
+
+#17 [dependencies 6/7] RUN apt-get -qq autoremove -y && apt-get -qq autoclean && apt-get -qq clean &&     rm -rf /root/* /root/.ros /tmp/* /var/lib/apt/lists/* /usr/share/doc/*
+#17 CACHED
+
+#18 [source 4/9] COPY src/robot/costmap costmap
+#18 CACHED
+
+#19 [source 6/9] COPY src/robot/planner planner
+#19 CACHED
+
+#20 [source 7/9] COPY src/robot/control control
+#20 CACHED
+
+#21 [dependencies 4/7] WORKDIR /home/bolty/ament_ws
+#21 CACHED
+
+#22 [build 1/4] WORKDIR /home/bolty/ament_ws
+#22 CACHED
+
+#23 [build 2/4] RUN . /opt/ros/humble/setup.sh &&     colcon build         --cmake-args -DCMAKE_BUILD_TYPE=Release --install-base /opt/watonomous/
+#23 0.940 Starting >>> control
+#23 0.952 Starting >>> costmap
+#23 0.958 Starting >>> map_memory
+#23 0.966 Starting >>> odometry_spoof
+#23 0.974 Starting >>> planner
+#23 11.52 --- stderr: costmap
+#23 11.52 /home/bolty/ament_ws/src/costmap/src/costmap_core.cpp: In member function ‘nav_msgs::msg::OccupancyGrid robot::CostmapCore::createCostmap(sensor_msgs::msg::LaserScan_<std::allocator<void> >::SharedPtr)’:
+#23 11.52 /home/bolty/ament_ws/src/costmap/src/costmap_core.cpp:23:33: error: ‘scan_msg’ was not declared in this scope
+#23 11.52    23 |   costmap_msg.header.frame_id = scan_msg->header.frame_id;
+#23 11.52       |                                 ^~~~~~~~
+#23 11.52 gmake[2]: *** [CMakeFiles/costmap_lib.dir/build.make:76: CMakeFiles/costmap_lib.dir/src/costmap_core.cpp.o] Error 1
+#23 11.52 gmake[1]: *** [CMakeFiles/Makefile2:139: CMakeFiles/costmap_lib.dir/all] Error 2
+#23 11.52 gmake: *** [Makefile:146: all] Error 2
+#23 11.52 ---
+#23 11.52 Failed   <<< costmap [10.6s, exited with code 2]
+#23 18.47 Aborted  <<< odometry_spoof [17.5s]
+#23 38.86 Aborted  <<< map_memory [37.9s]
+#23 39.38 Aborted  <<< control [38.5s]
+#23 44.00 Aborted  <<< planner [43.1s]
+#23 44.03 
+#23 44.03 Summary: 0 packages finished [43.4s]
+#23 44.03   1 package failed: costmap
+#23 44.03   4 packages aborted: control map_memory odometry_spoof planner
+#23 44.03   1 package had stderr output: costmap
+#23 44.03   1 package not processed
+#23 ERROR: process "/bin/bash -o pipefail -c . /opt/ros/$ROS_DISTRO/setup.sh &&     colcon build         --cmake-args -DCMAKE_BUILD_TYPE=Release --install-base ${WATONOMOUS_INSTALL}" did not complete successfully: exit code: 2
+------
+ > importing cache manifest from ghcr.io/watonomous/wato_asd_training/robot:rithanya-wato_training:
+------
+------
+ > importing cache manifest from ghcr.io/watonomous/wato_asd_training/robot:main:
+------
+------
+ > [build 2/4] RUN . /opt/ros/humble/setup.sh &&     colcon build         --cmake-args -DCMAKE_BUILD_TYPE=Release --install-base /opt/watonomous/:
+18.47 Aborted  <<< odometry_spoof [17.5s]
+38.86 Aborted  <<< map_memory [37.9s]
+39.38 Aborted  <<< control [38.5s]
+44.00 Aborted  <<< planner [43.1s]
+44.03 
+44.03 Summary: 0 packages finished [43.4s]
+44.03   1 package failed: costmap
+44.03   4 packages aborted: control map_memory odometry_spoof planner
+44.03   1 package had stderr output: costmap
+44.03   1 package not processed
+------
+robot.Dockerfile:46
+
+--------------------
+
+  45 |     WORKDIR ${AMENT_WS}
+
+  46 | >>> RUN . /opt/ros/$ROS_DISTRO/setup.sh && \
+
+  47 | >>>     colcon build \
+
+  48 | >>>         --cmake-args -DCMAKE_BUILD_TYPE=Release --install-base ${WATONOMOUS_INSTALL}
+
+  49 |     
+
+--------------------
+
+failed to solve: process "/bin/bash -o pipefail -c . /opt/ros/$ROS_DISTRO/setup.sh &&     colcon build         --cmake-args -DCMAKE_BUILD_TYPE=Release --install-base ${WATONOMOUS_INSTALL}" did not complete successfully: exit code: 2
+
+
+
+View build details: docker-desktop://dashboard/build/default/default/mlmadf131gr3gnpqknr5yfv09
+

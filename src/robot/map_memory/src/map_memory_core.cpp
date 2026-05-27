@@ -40,7 +40,7 @@ void MapMemoryCore::updateLatestOdom(
 
 void MapMemoryCore::initializeGlobalMap()
 {
-  global_map_.header.frame_id = "odom";
+  global_map_.header.frame_id = "sim_world";
 
   global_map_.info.resolution = 0.1;
   global_map_.info.width = 1000;
