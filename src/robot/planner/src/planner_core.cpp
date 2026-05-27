@@ -1,4 +1,5 @@
 #include "planner_core.hpp"
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <queue>
@@ -64,6 +65,11 @@ nav_msgs::msg::Path PlannerCore::planSimplePath()
     grid_y = static_cast<int>(std::floor((world_y - origin_y) / resolution));
 
     return grid_x >= 0 && grid_x < width && grid_y >= 0 && grid_y < height;
+  };
+
+  auto gridToWorld = [&](int grid_x, int grid_y, double& world_x, double& world_y) {
+    world_x = origin_x + (static_cast<double>(grid_x) + 0.5) * resolution;
+    world_y = origin_y + (static_cast<double>(grid_y) + 0.5) * resolution;
   };
 
   int start_x;
@@ -196,21 +202,40 @@ nav_msgs::msg::Path PlannerCore::planSimplePath()
     return path;
   }
 
-  geometry_msgs::msg::PoseStamped start;
-  start.header = path.header;
-  start.pose = robot_pose_;
+  std::vector<int> path_indices;
+  int current = goal_index;
 
-  geometry_msgs::msg::PoseStamped goal_pose;
-  goal_pose.header = path.header;
-  goal_pose.pose.position.x = goal_.point.x;
-  goal_pose.pose.position.y = goal_.point.y;
-  goal_pose.pose.position.z = 0.0;
-  goal_pose.pose.orientation.w = 1.0;
+  while (current != start_index) {
+    path_indices.push_back(current);
+    current = parent[current];
 
-  path.poses.push_back(start);
-  path.poses.push_back(goal_pose);
+    if (current < 0) {
+      RCLCPP_WARN(logger_, "Path reconstruction failed.");
+      return path;
+    }
+  }
 
-  return path;
+  path_indices.push_back(start_index);
+  std::reverse(path_indices.begin(), path_indices.end());
+
+  for (int cell_index : path_indices) {
+    const int grid_x = cell_index % width;
+    const int grid_y = cell_index / width;
+
+    double world_x;
+    double world_y;
+    gridToWorld(grid_x, grid_y, world_x, world_y);
+
+    geometry_msgs::msg::PoseStamped pose;
+    pose.header = path.header;
+    pose.pose.position.x = world_x;
+    pose.pose.position.y = world_y;
+    pose.pose.position.z = 0.0;
+    pose.pose.orientation.w = 1.0;
+    path.poses.push_back(pose);
+  }
+
+return path;
 }
 
 }
